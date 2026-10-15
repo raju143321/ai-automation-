@@ -26,6 +26,20 @@ import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
+const getBasename = (): string => {
+  if (typeof window !== 'undefined') {
+    // If hosted on GitHub Pages (e.g. raju143321.github.io/ai-automation-/)
+    if (window.location.hostname.endsWith('github.io') || window.location.pathname.startsWith('/ai-automation-')) {
+      const match = window.location.pathname.match(/^\/([^/]+)/);
+      if (match && match[1] && !['login', 'signup', 'app', 'forgot-password'].includes(match[1])) {
+        return `/${match[1]}`;
+      }
+      return '/ai-automation-';
+    }
+  }
+  return '/';
+};
+
 export const router = createBrowserRouter([
   // Public
   { path: '/', element: <LandingPage /> },
@@ -66,4 +80,6 @@ export const router = createBrowserRouter([
 
   // 404 Catch-all
   { path: '*', element: <NotFoundPage /> }
-]);
+], {
+  basename: getBasename()
+});
