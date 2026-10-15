@@ -1,27 +1,15 @@
-<!doctype html>
-<html lang="en" class="dark">
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><path d='M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20'/><path d='M2 12h20'/></svg>" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ResearchSphere AI — Production Research & Knowledge Discovery Workspace</title>
-    <meta name="description" content="AI-powered research and knowledge discovery workspace. Evidence-first literature reviews, cross-document comparison, claim verification, and knowledge graphs." />
-    <!-- Modern Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>ResearchSphere AI</title>
     <script>
-      (function() {
-        var redirect = sessionStorage.redirect;
-        delete sessionStorage.redirect;
-        if (redirect && redirect !== location.href) {
-          history.replaceState(null, null, redirect);
-        }
-      })();
+      // Single Page Application routing fallback for GitHub Pages
+      sessionStorage.redirect = location.href;
     </script>
-    <script type="module" crossorigin src="./assets/index-42oQ111f.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-Dfeeb9oW.css">
+    <meta http-equiv="refresh" content="0;URL='./'" />
   </head>
-  <body class="bg-[#0a0d14] text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
-    <div id="root"></div>
+  <body>
   </body>
 </html>
