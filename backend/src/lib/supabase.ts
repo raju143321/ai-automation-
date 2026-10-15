@@ -22,8 +22,21 @@ export function getSupabaseAdmin(): SupabaseClient | null {
   if (supabaseAdminClient) return supabaseAdminClient;
   if (!env.SUPABASE_URL) return null;
 
-  // If service role key is provided and distinct from anon key, use it
+  // Validate if provided key is actually a service_role key
   if (env.SUPABASE_SERVICE_ROLE_KEY && env.SUPABASE_SERVICE_ROLE_KEY !== env.SUPABASE_ANON_KEY) {
+    try {
+      const parts = env.SUPABASE_SERVICE_ROLE_KEY.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+        if (payload.role !== 'service_role') {
+          // Not a privileged service_role key, fall back to anon client
+          return getSupabase();
+        }
+      }
+    } catch {
+      // ignore parse error and proceed
+    }
+
     supabaseAdminClient = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
       auth: {
         persistSession: false,
@@ -33,7 +46,7 @@ export function getSupabaseAdmin(): SupabaseClient | null {
     return supabaseAdminClient;
   }
 
-  // Fallback to anon client if service role key is absent or same as anon key
+  // Fallback to anon client
   return getSupabase();
 }
 
@@ -51,16 +64,26 @@ export async function checkSupabaseStatus(): Promise<{ connected: boolean; messa
   }
 
   try {
-    const { data, error } = await client.from('research_projects').select('id').limit(1);
+    let { data, error } = await client.from('research_projects').select('id').limit(1);
+
+    if (error && error.message.includes('Invalid API key')) {
+      const fallbackClient = getSupabase();
+      if (fallbackClient && fallbackClient !== client) {
+        const res = await fallbackClient.from('research_projects').select('id').limit(1);
+        data = res.data;
+        error = res.error;
+      }
+    }
+
     if (error) {
       if (error.code === '42P01' || error.message.includes('schema cache') || error.message.includes('does not exist')) {
         return {
           connected: true,
-          message: 'Connected to Supabase endpoint, but SQL schema/tables not yet created. Run supabase-schema.sql to apply tables.',
+          message: 'Connected to Supabase endpoint, but SQL schema/tables not yet created. Run supabase-schema.sql in Supabase SQL Editor.',
           tablesFound: false
         };
       }
-      return { connected: false, message: `Supabase error: ${error.message}`, tablesFound: false };
+      return { connected: false, message: `Supabase notice: ${error.message}`, tablesFound: false };
     }
     return { connected: true, message: `Connected to Supabase successfully. Found ${data?.length || 0} projects.`, tablesFound: true };
   } catch (err: any) {

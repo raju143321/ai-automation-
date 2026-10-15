@@ -463,6 +463,15 @@
       "created_at": "2026-10-15T06:46:36.653Z",
       "user_email": "researcher@researchsphere.ai",
       "user_display_name": "Lead AI Researcher"
+    },
+    {
+      "id": "72433128-f2d7-4b6a-b23d-60c503afcdd2",
+      "project_id": "bef5ca71-3b1d-4589-a987-5604cd718ecf",
+      "user_id": "00000000-0000-0000-0000-000000000001",
+      "role": "owner",
+      "invited_by": null,
+      "accepted_at": "2026-10-15T08:54:57.223Z",
+      "created_at": "2026-10-15T08:54:57.223Z"
     }
   ],
   "audit_events": [

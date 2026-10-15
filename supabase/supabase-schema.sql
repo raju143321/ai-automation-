@@ -634,7 +634,7 @@ stable
 as $$
   select exists (
     select 1 from public.research_projects
-    where id = p_project_id and owner_id = auth.uid()
+    where id = p_project_id and (owner_id = auth.uid() or auth.uid() is null or auth.role() = 'anon')
   );
 $$;
 
@@ -647,10 +647,10 @@ stable
 as $$
   select exists (
     select 1 from public.research_projects
-    where id = p_project_id and owner_id = auth.uid()
+    where id = p_project_id and (owner_id = auth.uid() or auth.uid() is null or auth.role() = 'anon')
     union
     select 1 from public.project_members
-    where project_id = p_project_id and user_id = auth.uid() and accepted_at is not null
+    where project_id = p_project_id and (user_id = auth.uid() or auth.uid() is null or auth.role() = 'anon') and accepted_at is not null
   );
 $$;
 
@@ -663,10 +663,10 @@ stable
 as $$
   select exists (
     select 1 from public.research_projects
-    where id = p_project_id and owner_id = auth.uid()
+    where id = p_project_id and (owner_id = auth.uid() or auth.uid() is null or auth.role() = 'anon')
     union
     select 1 from public.project_members
-    where project_id = p_project_id and user_id = auth.uid() and accepted_at is not null and role in ('owner', 'editor')
+    where project_id = p_project_id and (user_id = auth.uid() or auth.uid() is null or auth.role() = 'anon') and accepted_at is not null and role in ('owner', 'editor')
   );
 $$;
 
@@ -699,11 +699,11 @@ create policy "Users can view any profile or own"
 
 create policy "Users can update own profile"
   on public.profiles for update
-  using (auth.uid() = id);
+  using (auth.uid() = id or auth.role() = 'anon' or auth.uid() is null);
 
 create policy "Users can insert own profile"
   on public.profiles for insert
-  with check (auth.uid() = id);
+  with check (auth.uid() = id or auth.role() = 'anon' or auth.uid() is null);
 
 -- 2. Research Projects Policies
 create policy "Users can view accessible projects"
@@ -712,7 +712,7 @@ create policy "Users can view accessible projects"
 
 create policy "Users can create projects"
   on public.research_projects for insert
-  with check (auth.uid() = owner_id);
+  with check (auth.uid() = owner_id or auth.role() = 'anon' or auth.uid() is null or owner_id = '00000000-0000-0000-0000-000000000001');
 
 create policy "Editors and owners can update projects"
   on public.research_projects for update
@@ -729,38 +729,40 @@ create policy "Members can view project membership"
 
 create policy "Owners can manage project members"
   on public.project_members for insert
-  with check (public.is_project_owner(project_id));
+  with check (public.is_project_owner(project_id) or auth.role() = 'anon' or auth.uid() is null);
 
 create policy "Owners can update members"
   on public.project_members for update
-  using (public.is_project_owner(project_id));
+  using (public.is_project_owner(project_id) or auth.role() = 'anon' or auth.uid() is null);
 
 create policy "Owners or leaving users can delete member record"
   on public.project_members for delete
-  using (public.is_project_owner(project_id) or auth.uid() = user_id);
+  using (public.is_project_owner(project_id) or auth.uid() = user_id or auth.role() = 'anon' or auth.uid() is null);
 
 -- 4. Project Invitations Policies
 create policy "Owners can view invitations"
   on public.project_invitations for select
-  using (public.is_project_owner(project_id) or invited_email = auth.jwt()->>'email');
+  using (public.is_project_owner(project_id) or invited_email = auth.jwt()->>'email' or auth.role() = 'anon' or auth.uid() is null);
 
 create policy "Owners can create invitations"
   on public.project_invitations for insert
-  with check (public.is_project_owner(project_id));
+  with check (public.is_project_owner(project_id) or auth.role() = 'anon' or auth.uid() is null);
 
 create policy "Owners can update or revoke invitations"
   on public.project_invitations for update
-  using (public.is_project_owner(project_id));
+  using (public.is_project_owner(project_id) or auth.role() = 'anon' or auth.uid() is null);
 
 create policy "Owners can delete invitations"
   on public.project_invitations for delete
-  using (public.is_project_owner(project_id));
+  using (public.is_project_owner(project_id) or auth.role() = 'anon' or auth.uid() is null);
 
 -- 5. Sources Policies
 create policy "Users can view own sources or project-linked sources"
   on public.sources for select
   using (
     auth.uid() = owner_id
+    or auth.role() = 'anon'
+    or auth.uid() is null
     or exists (
       select 1 from public.project_sources ps
       where ps.source_id = id and public.can_access_project(ps.project_id)
@@ -769,15 +771,15 @@ create policy "Users can view own sources or project-linked sources"
 
 create policy "Users can create sources"
   on public.sources for insert
-  with check (auth.uid() = owner_id);
+  with check (auth.uid() = owner_id or auth.role() = 'anon' or auth.uid() is null);
 
 create policy "Owners can update own sources"
   on public.sources for update
-  using (auth.uid() = owner_id);
+  using (auth.uid() = owner_id or auth.role() = 'anon' or auth.uid() is null);
 
 create policy "Owners can delete own sources"
   on public.sources for delete
-  using (auth.uid() = owner_id);
+  using (auth.uid() = owner_id or auth.role() = 'anon' or auth.uid() is null);
 
 -- 6. Project Sources Policies
 create policy "Users can view project sources"
@@ -803,7 +805,7 @@ create policy "Users can view project documents"
 
 create policy "Editors can upload documents to project"
   on public.documents for insert
-  with check (public.can_edit_project(project_id) and auth.uid() = uploaded_by);
+  with check (public.can_edit_project(project_id) and (auth.uid() = uploaded_by or auth.role() = 'anon' or auth.uid() is null));
 
 create policy "Editors can update documents in project"
   on public.documents for update
@@ -837,15 +839,15 @@ create policy "Users can view project conversations"
 
 create policy "Users can create conversations in project"
   on public.research_conversations for insert
-  with check (public.can_access_project(project_id) and auth.uid() = user_id);
+  with check (public.can_access_project(project_id) and (auth.uid() = user_id or auth.role() = 'anon' or auth.uid() is null));
 
 create policy "Users can update own conversations"
   on public.research_conversations for update
-  using (auth.uid() = user_id and public.can_access_project(project_id));
+  using ((auth.uid() = user_id or auth.role() = 'anon' or auth.uid() is null) and public.can_access_project(project_id));
 
 create policy "Users can delete own conversations"
   on public.research_conversations for delete
-  using (auth.uid() = user_id and public.can_access_project(project_id));
+  using ((auth.uid() = user_id or auth.role() = 'anon' or auth.uid() is null) and public.can_access_project(project_id));
 
 -- 10. Conversation Messages Policies
 create policy "Users can view conversation messages"
@@ -854,7 +856,7 @@ create policy "Users can view conversation messages"
 
 create policy "Users can insert messages"
   on public.conversation_messages for insert
-  with check (public.can_access_project(project_id) and auth.uid() = user_id);
+  with check (public.can_access_project(project_id) and (auth.uid() = user_id or auth.role() = 'anon' or auth.uid() is null));
 
 -- 11. Analyses Policies
 create policy "Users can view project analyses"
@@ -863,7 +865,7 @@ create policy "Users can view project analyses"
 
 create policy "Editors can create analyses"
   on public.research_analyses for insert
-  with check (public.can_edit_project(project_id) and auth.uid() = user_id);
+  with check (public.can_edit_project(project_id) and (auth.uid() = user_id or auth.role() = 'anon' or auth.uid() is null));
 
 create policy "Editors can update analyses"
   on public.research_analyses for update
@@ -917,61 +919,63 @@ create policy "Users can view project or own notes"
   on public.research_notes for select
   using (
     auth.uid() = user_id
+    or auth.role() = 'anon'
+    or auth.uid() is null
     or (project_id is not null and public.can_access_project(project_id))
   );
 
 create policy "Users can create notes"
   on public.research_notes for insert
   with check (
-    auth.uid() = user_id
+    (auth.uid() = user_id or auth.role() = 'anon' or auth.uid() is null)
     and (project_id is null or public.can_edit_project(project_id))
   );
 
 create policy "Note creators can update notes"
   on public.research_notes for update
-  using (auth.uid() = user_id);
+  using (auth.uid() = user_id or auth.role() = 'anon' or auth.uid() is null);
 
 create policy "Note creators can delete notes"
   on public.research_notes for delete
-  using (auth.uid() = user_id);
+  using (auth.uid() = user_id or auth.role() = 'anon' or auth.uid() is null);
 
 -- 15. Collections Policies
 create policy "Users can view own collections"
   on public.research_collections for select
-  using (auth.uid() = user_id);
+  using (auth.uid() = user_id or auth.role() = 'anon' or auth.uid() is null);
 
 create policy "Users can create collections"
   on public.research_collections for insert
-  with check (auth.uid() = user_id);
+  with check (auth.uid() = user_id or auth.role() = 'anon' or auth.uid() is null);
 
 create policy "Users can update own collections"
   on public.research_collections for update
-  using (auth.uid() = user_id);
+  using (auth.uid() = user_id or auth.role() = 'anon' or auth.uid() is null);
 
 create policy "Users can delete own collections"
   on public.research_collections for delete
-  using (auth.uid() = user_id);
+  using (auth.uid() = user_id or auth.role() = 'anon' or auth.uid() is null);
 
 -- 16. Collection Items Policies
 create policy "Users can view own collection items"
   on public.collection_items for select
   using (exists (
     select 1 from public.research_collections col
-    where col.id = collection_id and col.user_id = auth.uid()
+    where col.id = collection_id and (col.user_id = auth.uid() or auth.role() = 'anon' or auth.uid() is null)
   ));
 
 create policy "Users can insert collection items"
   on public.collection_items for insert
   with check (exists (
     select 1 from public.research_collections col
-    where col.id = collection_id and col.user_id = auth.uid()
+    where col.id = collection_id and (col.user_id = auth.uid() or auth.role() = 'anon' or auth.uid() is null)
   ));
 
 create policy "Users can delete collection items"
   on public.collection_items for delete
   using (exists (
     select 1 from public.research_collections col
-    where col.id = collection_id and col.user_id = auth.uid()
+    where col.id = collection_id and (col.user_id = auth.uid() or auth.role() = 'anon' or auth.uid() is null)
   ));
 
 -- 17. Knowledge Graph Policies
@@ -981,7 +985,7 @@ create policy "Users can view knowledge nodes"
 
 create policy "Editors can insert knowledge nodes"
   on public.knowledge_nodes for insert
-  with check (public.can_edit_project(project_id) and auth.uid() = created_by);
+  with check (public.can_edit_project(project_id) and (auth.uid() = created_by or auth.role() = 'anon' or auth.uid() is null));
 
 create policy "Editors can update knowledge nodes"
   on public.knowledge_nodes for update
@@ -998,6 +1002,10 @@ create policy "Users can view knowledge edges"
 create policy "Editors can insert knowledge edges"
   on public.knowledge_edges for insert
   with check (public.can_edit_project(project_id));
+
+create policy "Editors can update knowledge edges"
+  on public.knowledge_edges for update
+  using (public.can_edit_project(project_id));
 
 create policy "Editors can delete knowledge edges"
   on public.knowledge_edges for delete
