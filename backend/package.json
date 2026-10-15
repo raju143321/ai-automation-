@@ -1,5 +1,5 @@
 {
-  "name": "@researchsphere/api",
+  "name": "@researchsphere/backend",
   "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {

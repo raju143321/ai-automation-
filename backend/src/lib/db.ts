@@ -44,7 +44,12 @@ interface DatabaseStore {
   audit_events: AuditEvent[];
 }
 
-const DATA_DIR = path.resolve(process.cwd(), 'data');
+const candidateDirs = [
+  path.resolve(__dirname, '../../data'),
+  path.resolve(process.cwd(), 'backend/data'),
+  path.resolve(process.cwd(), 'data')
+];
+const DATA_DIR = candidateDirs.find(d => fs.existsSync(d)) || candidateDirs[0];
 const STORE_FILE = path.join(DATA_DIR, 'store.json');
 
 function initializeStore(): DatabaseStore {

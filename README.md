@@ -30,28 +30,31 @@ Researchers, academics, analysts, and organizations struggle to discover relevan
 
 ```text
 researchsphere-ai/
-├── apps/
-│   ├── web/                    # React 18 + Vite + Tailwind CSS + TanStack Query + Lucide Icons
-│   │   ├── src/
-│   │   │   ├── components/     # AppLayout, ProjectWorkspaceLayout, EvidenceDrawer, KnowledgeGraph, ExportModal
-│   │   │   ├── context/        # AuthContext (sessions, tokens, user state)
-│   │   │   ├── pages/          # Landing, Dashboard, Projects, Discovery, Library, Chat, Analysis, Claims, Graph, Notes, Settings
-│   │   │   ├── lib/            # api-client.ts, query-client.ts
-│   │   │   ├── router.tsx      # React Router configuration with 18+ routes
-│   │   │   └── main.tsx
-│   │   └── package.json
-│   │
-│   └── api/                    # Node.js + Express + Zod + @google/genai SDK + Multer
-│       ├── src/
-│       │   ├── config/         # env.ts with strict Zod validation
-│       │   ├── lib/            # supabase.ts (client), db.ts (resilient persistence layer)
-│       │   ├── middleware/     # auth.ts, rate-limit.ts, request-id.ts, validation.ts, error-handler.ts
-│       │   ├── services/       # gemini.service.ts, search.service.ts, document.service.ts, retrieval.service.ts, export.service.ts
-│       │   ├── routes/         # health, projects, discovery, documents, chat, analysis, claims, knowledge, notes, discoveries, exports
-│       │   ├── app.ts          # Express app configuration
-│       │   └── server.ts       # Server entrypoint
-│       ├── test/               # Automated integration tests
-│       └── package.json
+├── backend/                    # Node.js + Express + Zod + @google/genai SDK + Multer
+│   ├── src/
+│   │   ├── config/             # env.ts with strict Zod validation
+│   │   ├── lib/                # supabase.ts (client), db.ts (resilient persistence layer)
+│   │   ├── middleware/         # auth.ts, rate-limit.ts, request-id.ts, validation.ts, error-handler.ts
+│   │   ├── services/           # gemini.service.ts, search.service.ts, document.service.ts, retrieval.service.ts, export.service.ts
+│   │   ├── routes/             # health, projects, discovery, documents, chat, analysis, claims, knowledge, notes, discoveries, exports
+│   │   ├── app.ts              # Express app configuration
+│   │   └── server.ts           # Server entrypoint
+│   ├── data/                   # store.json local persistent database
+│   ├── test/                   # Automated integration tests
+│   ├── .env.example            # Backend-specific environment template
+│   └── package.json
+│
+├── frontend/                   # React 18 + Vite + Tailwind CSS + TanStack Query + Lucide Icons
+│   ├── src/
+│   │   ├── components/         # AppLayout, ProjectWorkspaceLayout, EvidenceDrawer, KnowledgeGraph, ExportModal
+│   │   ├── context/            # AuthContext (sessions, tokens, user state)
+│   │   ├── pages/              # Landing, Dashboard, Projects, Discovery, Library, Chat, Analysis, Claims, Graph, Notes, Settings
+│   │   ├── lib/                # api-client.ts, query-client.ts
+│   │   ├── router.tsx          # React Router configuration with 18+ routes
+│   │   └── main.tsx
+│   ├── public/                 # Static assets
+│   ├── .env.example            # Frontend-specific environment template
+│   └── package.json
 │
 ├── packages/
 │   └── shared/                 # Shared TypeScript types, Zod schemas, domain constants
@@ -67,7 +70,7 @@ researchsphere-ai/
 │
 ├── docs/                       # architecture.md, deployment.md, api.md
 ├── .env.example                # Standard environment configuration template
-└── package.json                # Monorepo root with npm workspaces
+└── package.json                # Root package with npm workspaces ("backend", "frontend", "packages/*")
 ```
 
 ---
@@ -85,38 +88,36 @@ researchsphere-ai/
 # 1. Clone repository & navigate to directory
 cd "research ai"
 
-# 2. Install monorepo dependencies across all packages
+# 2. Install dependencies across backend, frontend, and shared packages
 npm install
 
 # 3. Create .env file from template
 cp .env.example .env
 
-# 4. Build the shared contracts
-npm run build -w @researchsphere/shared
-
-# 5. Build API and Web packages
-npm run build -w @researchsphere/api
-npm run build -w @researchsphere/web
+# 4. Build all packages
+npm run build
 ```
 
 ---
 
 ## 4. Running the Application Locally
 
-You can launch both the backend API and frontend dev server concurrently with one command:
+You can launch both the backend API and frontend dev server concurrently with one command from the root:
 
 ```bash
 npm run dev
 ```
 
-Alternatively, run each service in separate terminal windows:
+Alternatively, run each service independently:
 
 ```bash
-# Terminal 1: Backend API (runs on http://localhost:3000)
-npm run dev -w @researchsphere/api
+# Option A: From root using workspace flags
+npm run dev:backend       # Backend API on http://localhost:3000
+npm run dev:frontend      # Web Frontend on http://localhost:5173
 
-# Terminal 2: Web Frontend (runs on http://localhost:5173)
-npm run dev -w @researchsphere/web
+# Option B: Directly from dedicated folders
+cd backend && npm run dev
+cd frontend && npm run dev
 ```
 
 Open your browser at **[http://localhost:5173](http://localhost:5173)** to access the application.
@@ -132,7 +133,7 @@ Run the test suite across packages:
 npm run test -w @researchsphere/shared
 
 # Run backend API integration & retrieval tests
-npm run test -w @researchsphere/api
+npm run test:backend
 ```
 
 ### Test Outcomes

@@ -5,13 +5,19 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "backend",
+    "frontend"
   ],
   "scripts": {
-    "dev": "concurrently -k -n \"API,WEB\" -c \"cyan,magenta\" \"npm run dev -w @researchsphere/api\" \"npm run dev -w @researchsphere/web\"",
-    "build": "npm run build -w @researchsphere/shared && npm run build -w @researchsphere/api && npm run build -w @researchsphere/web",
-    "lint": "npm run lint -w @researchsphere/api && npm run lint -w @researchsphere/web",
-    "test": "npm run test -w @researchsphere/shared && npm run test -w @researchsphere/api"
+    "dev": "concurrently -k -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"npm run dev -w @researchsphere/backend\" \"npm run dev -w @researchsphere/frontend\"",
+    "dev:backend": "npm run dev -w @researchsphere/backend",
+    "dev:frontend": "npm run dev -w @researchsphere/frontend",
+    "build": "npm run build -w @researchsphere/shared && npm run build -w @researchsphere/backend && npm run build -w @researchsphere/frontend",
+    "build:backend": "npm run build -w @researchsphere/backend",
+    "build:frontend": "npm run build -w @researchsphere/frontend",
+    "lint": "npm run lint -w @researchsphere/backend && npm run lint -w @researchsphere/frontend",
+    "test": "npm run test -w @researchsphere/shared && npm run test -w @researchsphere/backend",
+    "test:backend": "npm run test -w @researchsphere/backend"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

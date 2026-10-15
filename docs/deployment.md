@@ -58,8 +58,8 @@ CROSSREF_MAILTO=researcher@yourinstitution.org
 ```
 
 ### Build & Start Commands
-- **Build Command**: `npm install && npm run build -w @researchsphere/shared && npm run build -w @researchsphere/api`
-- **Start Command**: `node apps/api/dist/server.js`
+- **Build Command**: `npm install && npm run build -w @researchsphere/shared && npm run build -w @researchsphere/backend`
+- **Start Command**: `node backend/dist/server.js`
 
 ---
 
@@ -67,7 +67,7 @@ CROSSREF_MAILTO=researcher@yourinstitution.org
 
 ### Root Directory & Framework Preset
 - Framework Preset: **Vite**
-- Root Directory: `apps/web`
+- Root Directory: `frontend`
 
 ### Build & Output Settings
 - **Build Command**: `npm run build`
