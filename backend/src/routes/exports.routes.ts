@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { exportRequestSchema } from '@researchsphere/shared';
+import { exportRequestSchema } from '../shared/index.js';
 import { exportService } from '../services/export.service.js';
 import { validateBody } from '../middleware/validation.js';
 

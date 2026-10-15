@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import pdfParse from 'pdf-parse';
 import mammoth from 'mammoth';
 import * as xlsx from 'xlsx';
-import { Document, DocumentChunk } from '@researchsphere/shared';
+import { Document, DocumentChunk } from '../shared/index.js';
 import { db } from '../lib/db.js';
 import { env } from '../config/env.js';
 

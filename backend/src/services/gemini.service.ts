@@ -9,7 +9,7 @@ import {
   aiKnowledgeGraphOutputSchema,
   EvidenceRegistryItem,
   CitationDisplay
-} from '@researchsphere/shared';
+} from '../shared/index.js';
 import { env } from '../config/env.js';
 
 const SYSTEM_INSTRUCTION = `You are ResearchSphere AI, an elite research and knowledge discovery assistant designed to help researchers, academics, and analysts investigate questions, organize information, compare evidence, and synthesize verifiable conclusions.
@@ -436,7 +436,7 @@ Return JSON:
             source_title: item.source_title,
             source_url: item.canonical_url,
             doi: item.doi,
-            authors: item.authors?.map(a => a.name),
+            authors: item.authors?.map((a: any) => a.name),
             year: item.publication_date ? item.publication_date.split('-')[0] : undefined,
             page_number: item.page_number,
             excerpt: item.excerpt.slice(0, 300)
@@ -453,7 +453,7 @@ Return JSON:
           source_title: item.source_title,
           source_url: item.canonical_url,
           doi: item.doi,
-          authors: item.authors?.map(a => a.name),
+          authors: item.authors?.map((a: any) => a.name),
           year: item.publication_date ? item.publication_date.split('-')[0] : undefined,
           page_number: item.page_number,
           excerpt: item.excerpt.slice(0, 300)
@@ -496,7 +496,7 @@ ${second ? `\n2. **Comparative Context**: Further analysis in **${second.source_
       source_title: item.source_title,
       source_url: item.canonical_url,
       doi: item.doi,
-      authors: item.authors?.map(a => a.name),
+      authors: item.authors?.map((a: any) => a.name),
       year: item.publication_date ? item.publication_date.split('-')[0] : undefined,
       page_number: item.page_number,
       excerpt: item.excerpt.slice(0, 250)

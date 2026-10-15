@@ -20,7 +20,7 @@ import {
   CollectionItem,
   ProjectMember,
   AuditEvent
-} from '@researchsphere/shared';
+} from '../shared/index.js';
 import { getSupabaseAdmin, getSupabase, isSupabaseConfigured, checkSupabaseStatus } from './supabase.js';
 
 interface DatabaseStore {

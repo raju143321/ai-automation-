@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { createNoteSchema, updateNoteSchema } from '@researchsphere/shared';
+import { createNoteSchema, updateNoteSchema } from '../shared/index.js';
 import { db } from '../lib/db.js';
 import { validateBody } from '../middleware/validation.js';
 

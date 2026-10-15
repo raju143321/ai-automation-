@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { createAnalysisSchema, crossComparisonSchema } from '@researchsphere/shared';
+import { createAnalysisSchema, crossComparisonSchema } from '../shared/index.js';
 import { retrievalService } from '../services/retrieval.service.js';
 import { geminiService } from '../services/gemini.service.js';
 import { db } from '../lib/db.js';

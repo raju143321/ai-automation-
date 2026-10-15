@@ -80,7 +80,7 @@ knowledgeRouter.post('/projects/:projectId/knowledge/graph/generate', async (req
           source_node_id: sourceId,
           target_node_id: targetId,
           relation_type: e.relation_type,
-          evidence: e.evidence_ids.map(id => ({ evidence_id: id })),
+          evidence: e.evidence_ids.map((id: any) => ({ evidence_id: id })),
           confidence: e.confidence,
           origin_analysis_id: null,
           created_at: new Date().toISOString()

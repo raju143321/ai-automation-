@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { researchSearchSchema } from '@researchsphere/shared';
+import { researchSearchSchema } from '../shared/index.js';
 import { searchService } from '../services/search.service.js';
 import { db } from '../lib/db.js';
 import { validateBody } from '../middleware/validation.js';

@@ -1,4 +1,4 @@
-import { EvidenceRegistryItem, DocumentChunk, Source } from '@researchsphere/shared';
+import { EvidenceRegistryItem, DocumentChunk, Source } from '../shared/index.js';
 import { db } from '../lib/db.js';
 
 export interface RetrievalResult {
@@ -179,7 +179,7 @@ export class RetrievalService {
     // 5. Build bounded context string with clear IDs
     const formattedContext = selected.map(ev => {
       const authorStr = ev.authors && ev.authors.length > 0
-        ? `Authors: ${ev.authors.map(a => a.name).join(', ')} | `
+        ? `Authors: ${ev.authors.map((a: any) => a.name).join(', ')} | `
         : '';
       const doiStr = ev.doi ? `DOI: ${ev.doi} | ` : '';
       const pageStr = ev.page_number ? `Page: ${ev.page_number} | ` : '';

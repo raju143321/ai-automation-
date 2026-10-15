@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
-    "@researchsphere/shared": "*",
     "@supabase/supabase-js": "^2.48.1",
     "@tanstack/react-query": "^5.64.2",
     "clsx": "^2.1.1",

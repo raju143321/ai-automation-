@@ -47,7 +47,7 @@ discoveriesRouter.post('/projects/:projectId/discoveries/generate', async (req, 
         title: d.title,
         description: d.description,
         why_it_matters: d.why_it_matters,
-        evidence: d.evidence_ids.map(id => {
+        evidence: d.evidence_ids.map((id: any) => {
           const r = evidenceRegistry.find(reg => reg.evidence_id === id);
           return { evidence_id: id, excerpt: r?.excerpt, source_title: r?.source_title };
         }),

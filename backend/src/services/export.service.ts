@@ -1,4 +1,4 @@
-import { ResearchProject, Source, ResearchAnalysis, CitationStyle } from '@researchsphere/shared';
+import { ResearchProject, Source, ResearchAnalysis, CitationStyle } from '../shared/index.js';
 import { db } from '../lib/db.js';
 
 export interface ExportOptions {
@@ -230,7 +230,7 @@ export class ExportService {
 
   private formatCitation(source: Source, index: number, style: CitationStyle): string {
     const authors = source.authors && source.authors.length > 0
-      ? source.authors.map(a => a.name).join(', ')
+      ? source.authors.map((a: any) => a.name).join(', ')
       : 'Author Unknown';
     const year = source.publication_date ? source.publication_date.split('-')[0] : 'n.d.';
     const title = source.title;

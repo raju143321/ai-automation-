@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createProjectSchema, updateProjectSchema } from '@researchsphere/shared';
+import { createProjectSchema, updateProjectSchema } from '../shared/index.js';
 import { db } from '../lib/db.js';
 import { validateBody } from '../middleware/validation.js';
 

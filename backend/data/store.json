@@ -1,6 +1,35 @@
 {
   "projects": [
     {
+      "id": "f7dc82ec-92c1-4482-9121-101d65c3235d",
+      "owner_id": "00000000-0000-0000-0000-000000000001",
+      "title": "ai research",
+      "research_question": "ai research",
+      "description": null,
+      "domain": "cs-ai",
+      "subdomain": "artificial intelligence",
+      "objectives": [
+        "Evaluate empirical scaling performance and parameter efficiency",
+        "Identify theoretical bottlenecks and conflicting literature claims"
+      ],
+      "scope": "ai",
+      "language": "en",
+      "date_from": null,
+      "date_to": null,
+      "source_types": [
+        "scholarly",
+        "uploaded_document",
+        "web"
+      ],
+      "tags": [],
+      "citation_style": "APA",
+      "research_depth": "standard",
+      "status": "active",
+      "archived_at": null,
+      "created_at": "2026-10-15T09:08:26.447Z",
+      "updated_at": "2026-10-15T09:08:26.447Z"
+    },
+    {
       "id": "11111111-1111-1111-1111-111111111111",
       "owner_id": "00000000-0000-0000-0000-000000000001",
       "title": "Architectural Trade-offs in Multi-Head Attention and State-Space Models",
@@ -472,6 +501,15 @@
       "invited_by": null,
       "accepted_at": "2026-10-15T08:54:57.223Z",
       "created_at": "2026-10-15T08:54:57.223Z"
+    },
+    {
+      "id": "3a3d9a3d-2ce0-4a65-bc5f-66715c3804e3",
+      "project_id": "f7dc82ec-92c1-4482-9121-101d65c3235d",
+      "user_id": "00000000-0000-0000-0000-000000000001",
+      "role": "owner",
+      "invited_by": null,
+      "accepted_at": "2026-10-15T09:08:26.447Z",
+      "created_at": "2026-10-15T09:08:26.447Z"
     }
   ],
   "audit_events": [

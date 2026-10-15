@@ -40,7 +40,7 @@ claimsRouter.post('/projects/:projectId/claims/extract', async (req, res, next) 
     const createdClaims = [];
     for (const c of extraction.claims) {
       const claimId = uuidv4();
-      const evidenceItems = c.evidence.map(e => {
+      const evidenceItems = c.evidence.map((e: any) => {
         const regItem = evidenceRegistry.find(r => r.evidence_id === e.evidence_id);
         return {
           id: uuidv4(),

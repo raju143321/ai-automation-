@@ -1,4 +1,4 @@
-import { Source, Author } from '@researchsphere/shared';
+import { Source, Author } from '../shared/index.js';
 import { env } from '../config/env.js';
 
 export interface SearchResultItem {
