@@ -16,6 +16,7 @@
     "build:all": "npm run build -w @researchsphere/backend && npm run build -w @researchsphere/frontend",
     "build:backend": "npm run build -w @researchsphere/backend",
     "build:frontend": "npm --prefix frontend run build",
+    "deploy:pages": "npm --prefix frontend run build && npx -y gh-pages -d frontend/dist -b gh-pages",
     "lint": "npm run lint -w @researchsphere/backend && npm run lint -w @researchsphere/frontend",
     "test": "npm run test -w @researchsphere/backend",
     "test:backend": "npm run test -w @researchsphere/backend"

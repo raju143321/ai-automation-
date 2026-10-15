@@ -31,6 +31,7 @@ app.use(cors({
     if (
       origin === env.CLIENT_URL ||
       origin.endsWith('.vercel.app') ||
+      origin.endsWith('.github.io') ||
       origin.includes('localhost') ||
       origin.includes('127.0.0.1')
     ) {
