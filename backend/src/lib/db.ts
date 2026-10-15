@@ -21,7 +21,7 @@ import {
   ProjectMember,
   AuditEvent
 } from '@researchsphere/shared';
-import { getSupabaseAdmin, isSupabaseConfigured } from './supabase.js';
+import { getSupabaseAdmin, getSupabase, isSupabaseConfigured, checkSupabaseStatus } from './supabase.js';
 
 interface DatabaseStore {
   projects: ResearchProject[];
@@ -471,9 +471,70 @@ function initializeStore(): DatabaseStore {
 
 class DatabaseManager {
   private store: DatabaseStore;
+  public isSupabaseConnected: boolean = false;
 
   constructor() {
     this.store = this.loadStore();
+    this.initSupabaseSync().catch(err => {
+      console.warn('[Supabase Sync Notice]:', err.message);
+    });
+  }
+
+  private async initSupabaseSync() {
+    if (!isSupabaseConfigured()) {
+      console.log('[Database] Operating with local persistent store (store.json).');
+      return;
+    }
+
+    try {
+      const status = await checkSupabaseStatus();
+      console.log(`[Database] Supabase Status: ${status.message}`);
+      if (status.connected && status.tablesFound) {
+        this.isSupabaseConnected = true;
+        const client = getSupabaseAdmin() || getSupabase();
+        if (!client) return;
+
+        const { data: remoteProjects, error } = await client.from('research_projects').select('*');
+        if (!error && remoteProjects && remoteProjects.length > 0) {
+          console.log(`[Database] Successfully synchronized ${remoteProjects.length} projects from Supabase PostgreSQL.`);
+          for (const rp of remoteProjects) {
+            const idx = this.store.projects.findIndex(p => p.id === rp.id);
+            if (idx >= 0) {
+              this.store.projects[idx] = { ...this.store.projects[idx], ...rp };
+            } else {
+              this.store.projects.unshift(rp as ResearchProject);
+            }
+          }
+          this.save();
+        }
+      }
+    } catch (e: any) {
+      console.warn('[Database] Supabase initial query note:', e.message);
+    }
+  }
+
+  private syncToSupabase(table: string, payload: any, operation: 'upsert' | 'delete' = 'upsert') {
+    if (!isSupabaseConfigured()) return;
+    const client = getSupabaseAdmin() || getSupabase();
+    if (!client) return;
+
+    (async () => {
+      try {
+        if (operation === 'upsert') {
+          const { error } = await client.from(table).upsert(payload);
+          if (error && !error.message.includes('schema cache') && !error.message.includes('does not exist')) {
+            console.warn(`[Supabase ${table} sync]:`, error.message);
+          }
+        } else if (operation === 'delete') {
+          const { error } = await client.from(table).delete().match(payload);
+          if (error && !error.message.includes('schema cache') && !error.message.includes('does not exist')) {
+            console.warn(`[Supabase ${table} delete]:`, error.message);
+          }
+        }
+      } catch (err: any) {
+        // Non-blocking sync error
+      }
+    })();
   }
 
   private loadStore(): DatabaseStore {
@@ -558,6 +619,7 @@ class DatabaseManager {
       created_at: new Date().toISOString()
     });
     this.save();
+    this.syncToSupabase('research_projects', project);
     return project;
   }
 
@@ -570,6 +632,7 @@ class DatabaseManager {
       updated_at: new Date().toISOString()
     };
     this.save();
+    this.syncToSupabase('research_projects', this.store.projects[idx]);
     return this.store.projects[idx];
   }
 
@@ -584,6 +647,7 @@ class DatabaseManager {
     this.store.edges = this.store.edges.filter(e => e.project_id !== projectId);
     this.store.discoveries = this.store.discoveries.filter(d => d.project_id !== projectId);
     this.save();
+    this.syncToSupabase('research_projects', { id: projectId }, 'delete');
     return this.store.projects.length < initialLen;
   }
 
@@ -633,6 +697,15 @@ class DatabaseManager {
       });
     }
     this.save();
+    this.syncToSupabase('sources', existing);
+    this.syncToSupabase('project_sources', {
+      project_id: projectId,
+      source_id: existing.id,
+      added_by: userId,
+      tags: [],
+      relevance_score: 0.9,
+      notes: null
+    });
     return existing;
   }
 
@@ -644,12 +717,14 @@ class DatabaseManager {
   public addDocument(doc: Document): Document {
     this.store.documents.unshift(doc);
     this.save();
+    this.syncToSupabase('documents', doc);
     return doc;
   }
 
   public addChunks(chunks: DocumentChunk[]) {
     this.store.document_chunks.push(...chunks);
     this.save();
+    this.syncToSupabase('document_chunks', chunks);
   }
 
   public getChunks(projectId: string): DocumentChunk[] {
@@ -682,6 +757,7 @@ class DatabaseManager {
   public addMessage(msg: ConversationMessage): ConversationMessage {
     this.store.messages.push(msg);
     this.save();
+    this.syncToSupabase('conversation_messages', msg);
     return msg;
   }
 
@@ -693,6 +769,7 @@ class DatabaseManager {
   public addAnalysis(analysis: ResearchAnalysis): ResearchAnalysis {
     this.store.analyses.unshift(analysis);
     this.save();
+    this.syncToSupabase('research_analyses', analysis);
     return analysis;
   }
 
@@ -711,6 +788,7 @@ class DatabaseManager {
       this.store.claim_evidence.push(...evidenceItems);
     }
     this.save();
+    this.syncToSupabase('research_claims', claim);
     return {
       ...claim,
       evidence_items: evidenceItems
@@ -726,6 +804,7 @@ class DatabaseManager {
       updated_at: new Date().toISOString()
     };
     this.save();
+    this.syncToSupabase('research_claims', this.store.claims[idx]);
     return this.store.claims[idx];
   }
 
@@ -739,12 +818,14 @@ class DatabaseManager {
   public addKnowledgeNode(node: KnowledgeNode): KnowledgeNode {
     this.store.nodes.push(node);
     this.save();
+    this.syncToSupabase('knowledge_nodes', node);
     return node;
   }
 
   public addKnowledgeEdge(edge: KnowledgeEdge): KnowledgeEdge {
     this.store.edges.push(edge);
     this.save();
+    this.syncToSupabase('knowledge_edges', edge);
     return edge;
   }
 
@@ -756,6 +837,7 @@ class DatabaseManager {
   public addDiscovery(discovery: ResearchDiscovery): ResearchDiscovery {
     this.store.discoveries.unshift(discovery);
     this.save();
+    this.syncToSupabase('research_discoveries', discovery);
     return discovery;
   }
 
@@ -768,6 +850,7 @@ class DatabaseManager {
       updated_at: new Date().toISOString()
     };
     this.save();
+    this.syncToSupabase('research_discoveries', this.store.discoveries[idx]);
     return this.store.discoveries[idx];
   }
 
@@ -779,6 +862,7 @@ class DatabaseManager {
   public addNote(note: ResearchNote): ResearchNote {
     this.store.notes.unshift(note);
     this.save();
+    this.syncToSupabase('research_notes', note);
     return note;
   }
 
@@ -791,6 +875,7 @@ class DatabaseManager {
       updated_at: new Date().toISOString()
     };
     this.save();
+    this.syncToSupabase('research_notes', this.store.notes[idx]);
     return this.store.notes[idx];
   }
 
@@ -798,6 +883,7 @@ class DatabaseManager {
     const len = this.store.notes.length;
     this.store.notes = this.store.notes.filter(n => n.id !== noteId);
     this.save();
+    this.syncToSupabase('research_notes', { id: noteId }, 'delete');
     return this.store.notes.length < len;
   }
 
