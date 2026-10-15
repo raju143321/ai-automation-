@@ -1,0 +1,19 @@
+{
+  "name": "researchsphere-ai",
+  "version": "1.0.0",
+  "description": "ResearchSphere AI — Production-grade full-stack research & knowledge discovery workspace",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n \"API,WEB\" -c \"cyan,magenta\" \"npm run dev -w @researchsphere/api\" \"npm run dev -w @researchsphere/web\"",
+    "build": "npm run build -w @researchsphere/shared && npm run build -w @researchsphere/api && npm run build -w @researchsphere/web",
+    "lint": "npm run lint -w @researchsphere/api && npm run lint -w @researchsphere/web",
+    "test": "npm run test -w @researchsphere/shared && npm run test -w @researchsphere/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
