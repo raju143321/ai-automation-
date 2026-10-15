@@ -1,5 +1,5 @@
 import React from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createHashRouter, Navigate } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
 import { ProjectWorkspaceLayout } from './components/layout/ProjectWorkspaceLayout';
 
@@ -26,21 +26,7 @@ import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
-const getBasename = (): string => {
-  if (typeof window !== 'undefined') {
-    // If hosted on GitHub Pages (e.g. raju143321.github.io/ai-automation-/)
-    if (window.location.hostname.endsWith('github.io') || window.location.pathname.startsWith('/ai-automation-')) {
-      const match = window.location.pathname.match(/^\/([^/]+)/);
-      if (match && match[1] && !['login', 'signup', 'app', 'forgot-password'].includes(match[1])) {
-        return `/${match[1]}`;
-      }
-      return '/ai-automation-';
-    }
-  }
-  return '/';
-};
-
-export const router = createBrowserRouter([
+export const router = createHashRouter([
   // Public
   { path: '/', element: <LandingPage /> },
   { path: '/login', element: <LoginPage /> },
@@ -80,6 +66,4 @@ export const router = createBrowserRouter([
 
   // 404 Catch-all
   { path: '*', element: <NotFoundPage /> }
-], {
-  basename: getBasename()
-});
+]);

@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ResearchSphere AI</title>
     <script>
-      // Single Page Application routing fallback for GitHub Pages
-      sessionStorage.redirect = location.href;
+      var path = window.location.pathname.replace(/^\/ai-automation-/, '').replace(/^\//, '');
+      var search = window.location.search || '';
+      var hash = path ? '#/' + path : '#/';
+      window.location.replace('/ai-automation-/' + hash + search);
     </script>
-    <meta http-equiv="refresh" content="0;URL='./'" />
   </head>
   <body>
   </body>
