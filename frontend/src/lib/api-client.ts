@@ -1,4 +1,5 @@
-const API_BASE = '/api/v1';
+const rawBase = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+const API_BASE = rawBase.endsWith('/') ? rawBase.slice(0, -1) : rawBase;
 
 export class ApiError extends Error {
   code: string;
@@ -75,7 +76,7 @@ export async function apiRequest<T>(
       return handleLocalProjectCreation<T>(options.body);
     }
     throw new ApiError(
-      'Unable to connect to the backend server. Please make sure the backend is running on http://localhost:3000.',
+      `Unable to connect to the backend server (${import.meta.env.VITE_SERVER_URL || 'https://ai-automation-cxjp.onrender.com'}).`,
       'NETWORK_ERROR'
     );
   }
@@ -110,7 +111,7 @@ export async function apiRequest<T>(
     const errorInfo = data.error || {};
     const message = errorInfo.message || (
       response.status === 502 || response.status === 504 || !rawText
-        ? 'The backend API server is unreachable on port 3000. Please start the backend with npm run dev or npm run dev:backend.'
+        ? 'The backend API server is unreachable. Please verify the backend service is active.'
         : `Request failed with status ${response.status}`
     );
 
