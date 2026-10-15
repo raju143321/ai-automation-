@@ -1,0 +1,132 @@
+# ==============================================================================
+# ResearchSphere AI — Git Ignore Configuration
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Environment & Secret Configuration (NEVER push credentials to GitHub)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+*.env
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# Secret keys, certificates, & credentials
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*.id_rsa
+credentials.json
+client_secret*.json
+service-account*.json
+*token.json
+
+# ------------------------------------------------------------------------------
+# 2. Dependency Directories
+# ------------------------------------------------------------------------------
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+.pnpm-store/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+
+# ------------------------------------------------------------------------------
+# 3. Production Builds, Bundles, & Cache
+# ------------------------------------------------------------------------------
+dist/
+**/dist/
+build/
+**/build/
+out/
+.next/
+.turbo/
+.parcel-cache/
+.vite/
+**/.vite/
+*.tsbuildinfo
+.eslintcache
+.cache/
+**/.cache/
+
+# ------------------------------------------------------------------------------
+# 4. Logs, Runtime, & Process Files
+# ------------------------------------------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+pids
+*.pid
+*.seed
+*.pid.lock
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# ------------------------------------------------------------------------------
+# 5. Testing & Code Coverage
+# ------------------------------------------------------------------------------
+coverage/
+**/coverage/
+.nyc_output/
+.vitest/
+playwright-report/
+test-results/
+
+# ------------------------------------------------------------------------------
+# 6. Uploads, Scratchpads, & Temporary Research Artifacts
+# ------------------------------------------------------------------------------
+uploads/
+**/uploads/
+temp_exports/
+**/temp_exports/
+scratch/
+**/scratch/
+tmp/
+temp/
+*.tmp
+*.temp
+
+# ------------------------------------------------------------------------------
+# 7. IDE, Editor, & Tool Caches
+# ------------------------------------------------------------------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+*~
+
+# ------------------------------------------------------------------------------
+# 8. Operating System & System Files
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+*.lnk
+
+# ------------------------------------------------------------------------------
+# 9. Legacy / Deprecated Directories (Local editor compatibility only)
+# ------------------------------------------------------------------------------
+apps/
