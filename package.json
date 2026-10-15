@@ -12,12 +12,16 @@
     "dev": "concurrently -k -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"npm run dev -w @researchsphere/backend\" \"npm run dev -w @researchsphere/frontend\"",
     "dev:backend": "npm run dev -w @researchsphere/backend",
     "dev:frontend": "npm run dev -w @researchsphere/frontend",
-    "build": "npm run build -w @researchsphere/shared && npm run build -w @researchsphere/backend && npm run build -w @researchsphere/frontend",
+    "build": "npm --prefix frontend run build",
+    "build:all": "npm run build -w @researchsphere/backend && npm run build -w @researchsphere/frontend",
     "build:backend": "npm run build -w @researchsphere/backend",
-    "build:frontend": "npm run build -w @researchsphere/frontend",
+    "build:frontend": "npm --prefix frontend run build",
     "lint": "npm run lint -w @researchsphere/backend && npm run lint -w @researchsphere/frontend",
-    "test": "npm run test -w @researchsphere/shared && npm run test -w @researchsphere/backend",
+    "test": "npm run test -w @researchsphere/backend",
     "test:backend": "npm run test -w @researchsphere/backend"
+  },
+  "dependencies": {
+    "vite": "^6.0.7"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
